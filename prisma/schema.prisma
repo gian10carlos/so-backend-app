@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model People {
+  id               Int              @id @default(autoincrement())
+  dni              String           @unique
+  code_identity    String
+  card_number      String           @unique
+  ccv              String
+  code_key         String
+  password         String
+  status           Boolean          @default(true)
+  token            String?
+  refreshing_token String?
+  create_at        DateTime         @default(now())
+  update_at        DateTime         @updatedAt
+  accounts         Account[]
+  transfers        Transfer[]
+  person_balances  PersonBalances[]
+
+  sent_messages     Message[] @relation("SenderRelation")
+  received_messages Message[] @relation("AddresseeRelation")
+}
+
+model PersonBalances {
+  id        Int      @unique @default(autoincrement())
+  id_people Int      @unique
+  amount    Float    @default(0)
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+  people    People   @relation(fields: [id_people], references: [id])
+}
+
+model Account {
+  id        Int       @unique @default(autoincrement())
+  id_people Int
+  ip_log    String
+  dateInp   DateTime
+  dateUtil  DateTime?
+  dateOut   DateTime?
+  status    Boolean   @default(true)
+
+  People People? @relation(fields: [id_people], references: [id])
+}
+
+model Message {
+  id           Int       @unique @default(autoincrement())
+  id_people    Int?
+  id_addressee Int?
+  id_transfer  Int?
+  message      String
+  create_at    DateTime  @default(now())
+  update__at   DateTime  @updatedAt
+  sender       People?   @relation("SenderRelation", fields: [id_people], references: [id])
+  addressee    People?   @relation("AddresseeRelation", fields: [id_addressee], references: [id])
+  transfer     Transfer? @relation(fields: [id_transfer], references: [id])
+}
+
+model Transfer {
+  id        Int      @unique @default(autoincrement())
+  id_people Int
+  amount    Float
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  people   People    @relation(fields: [id_people], references: [id])
+  messages Message[]
+}
