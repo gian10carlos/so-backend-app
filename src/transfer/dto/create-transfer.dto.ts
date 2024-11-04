@@ -3,11 +3,11 @@ import { IsInt, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateTransferDto {
     @ApiProperty()
-    @IsNumber()
+    @IsInt()
     id_sender: number
 
     @ApiProperty()
-    @IsNumber()
+    @IsInt()
     id_recipient: number
 
     @ApiProperty()
