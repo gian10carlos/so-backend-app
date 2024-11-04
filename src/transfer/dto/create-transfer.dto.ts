@@ -8,6 +8,7 @@ export class CreateTransferDto {
 
     @ApiProperty()
     @IsInt()
+
     id_recipient: number
 
     @ApiProperty()
