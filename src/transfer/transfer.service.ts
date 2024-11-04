@@ -45,8 +45,8 @@ export class TransferService {
         const transfers = await this.prisma.transfer.findMany({
             where: {
                 OR: [
-                    { id_sender: senderId },
-                    { id_recipient: senderId }
+                    { sender: { id: senderId } },
+                    { recipient: { id: senderId } }
                 ]
             }
         });
