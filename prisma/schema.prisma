@@ -27,8 +27,8 @@ model People {
   create_at        DateTime         @default(now())
   update_at        DateTime         @updatedAt
   accounts         Account[]
-  sent_transfers   Transfer[]       @relation("SenderTransferRelation")
-  received         Transfer[]       @relation("RecipientTransferRelation")
+  sent_transfers   Transfer[]       @relation(name: "SenderTransferRelation")
+  received         Transfer[]       @relation(name: "RecipientTransferRelation")
   person_balances  PersonBalances[]
 }
 
@@ -72,7 +72,7 @@ model Transfer {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  sender    People    @relation("SenderTransferRelation", fields: [id_sender], references: [id])
-  recipient People    @relation("RecipientTransferRelation", fields: [id_recipient], references: [id])
+  sender    People    @relation(name: "SenderTransferRelation", fields: [id_sender], references: [id])
+  recipient People    @relation(name: "RecipientTransferRelation", fields: [id_recipient], references: [id])
   messages  Message[]
 }
