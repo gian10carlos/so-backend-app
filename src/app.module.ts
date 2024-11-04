@@ -12,6 +12,7 @@ import { TransferModule } from './transfer/transfer.module';
       load: [EnvConfiguration],
       validationSchema: JoiValidationSchema,
     }),
+    PeopleModule,
     AuthModule,
     PeopleModule,
     TransferModule,
