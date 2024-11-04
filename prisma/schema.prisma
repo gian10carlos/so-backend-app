@@ -54,7 +54,6 @@ model Account {
 }
 
 model Message {
-  id           Int      @unique @default(autoincrement())
   id_transfer  Int      @unique
   message_text String?
   create_at    DateTime @default(now())

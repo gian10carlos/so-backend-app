@@ -25,9 +25,14 @@ export class TransferService {
                 },
                 select: {
                     id: true,
-                    send: true,
-                    received: true,
+                    id_send: true,
+                    id_received: true,
                     amount: true,
+                    message: {
+                        select: {
+                            message_text: true,
+                        },
+                    },
                 }
             });
 
