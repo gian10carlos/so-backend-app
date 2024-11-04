@@ -23,8 +23,8 @@ export class TransferService {
 
             const transfer = await this.prisma.transfer.create({
                 data: {
-                    id_sender: createTransferDto.id_sender,
-                    id_recipient: createTransferDto.id_recipient,
+                    sender: { connect: { id: createTransferDto.id_sender } },
+                    recipient: { connect: { id: createTransferDto.id_recipient } },
                     amount: createTransferDto.amount,
                     date: new Date(createTransferDto.date),
                     messages: messageData ? { create: { message: createTransferDto.message } } : undefined,
@@ -48,8 +48,8 @@ export class TransferService {
         const transfers = await this.prisma.transfer.findMany({
             where: {
                 OR: [
-                    { sender: { id: senderId } },
-                    { recipient: { id: senderId } }
+                    { id_sender: senderId },
+                    { id_recipient: senderId }
                 ]
             }
         });
