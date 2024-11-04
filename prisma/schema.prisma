@@ -14,22 +14,22 @@ datasource db {
 }
 
 model People {
-  id               Int              @id @default(autoincrement())
-  dni              String           @unique
-  code_identity    String
-  card_number      String           @unique
-  ccv              String
-  code_key         String
-  password         String
-  status           Boolean          @default(true)
-  token            String?
-  refreshing_token String?
-  create_at        DateTime         @default(now())
-  update_at        DateTime         @updatedAt
-  accounts         Account[]
-  sent_transfers   Transfer[]       @relation(name: "SenderTransferRelation")
-  received         Transfer[]       @relation(name: "RecipientTransferRelation")
-  person_balances  PersonBalances[]
+  id                Int              @id @default(autoincrement())
+  dni               String           @unique
+  code_identity     String
+  card_number       String           @unique
+  ccv               String
+  code_key          String
+  password          String
+  status            Boolean          @default(true)
+  token             String?
+  refreshing_token  String?
+  create_at         DateTime         @default(now())
+  update_at         DateTime         @updatedAt
+  accounts          Account[]
+  sentTransfers     Transfer[]       @relation(name: "SenderTransferRelation")
+  receivedTransfers Transfer[]       @relation(name: "RecipientTransferRelation")
+  person_balances   PersonBalances[]
 }
 
 model PersonBalances {
@@ -64,15 +64,15 @@ model Message {
 }
 
 model Transfer {
-  id           Int      @unique @default(autoincrement())
-  id_sender    Int
-  id_recipient Int
-  amount       Float
-  date         DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          Int      @unique @default(autoincrement())
+  senderId    Int      @map("id_sender")
+  recipientId Int      @map("id_recipient")
+  amount      Float
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  sender    People    @relation(name: "SenderTransferRelation", fields: [id_sender], references: [id])
-  recipient People    @relation(name: "RecipientTransferRelation", fields: [id_recipient], references: [id])
+  sender    People    @relation(name: "SenderTransferRelation", fields: [senderId], references: [id])
+  recipient People    @relation(name: "RecipientTransferRelation", fields: [recipientId], references: [id])
   messages  Message[]
 }
