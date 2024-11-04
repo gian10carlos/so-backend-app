@@ -4,11 +4,11 @@ import { IsInt, IsNumber, IsOptional, IsString } from "class-validator";
 export class CreateTransferDto {
     @ApiProperty()
     @IsInt()
-    senderId: number;
+    id_send: number;
 
     @ApiProperty()
     @IsInt()
-    recipientId: number;
+    id_received: number;
 
     @ApiProperty()
     @IsNumber({}, { message: 'Amount must be a valid number' })
@@ -21,5 +21,5 @@ export class CreateTransferDto {
     @ApiProperty()
     @IsOptional()
     @IsString()
-    message: string;
+    message_text: string;
 }

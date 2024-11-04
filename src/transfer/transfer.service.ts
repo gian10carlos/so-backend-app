@@ -4,34 +4,37 @@ import { CreateTransferDto } from "./dto";
 
 @Injectable()
 export class TransferService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+    ) { }
 
     async create(createTransferDto: CreateTransferDto) {
         try {
-            const messageData = createTransferDto.message?.trim()
-                ? { create: { message: createTransferDto.message } }
-                : undefined;
+            const transferDtoData = {
+
+                id_send: createTransferDto.id_send,
+                id_received: createTransferDto.id_received,
+                amount: createTransferDto.amount,
+                date: createTransferDto.date,
+            }
 
             const transfer = await this.prisma.transfer.create({
                 data: {
-                    sender: { connect: { id: createTransferDto.senderId } },
-                    recipient: { connect: { id: createTransferDto.recipientId } },
-                    amount: createTransferDto.amount,
-                    date: new Date(createTransferDto.date),
-                    messages: messageData,
+                    ...transferDtoData,
+                    message: { create: { message_text: createTransferDto.message_text } }
                 },
                 select: {
                     id: true,
-                    sender: { select: { id: true, dni: true } },
-                    recipient: { select: { id: true, dni: true } },
+                    send: true,
+                    received: true,
                     amount: true,
-                },
+                }
             });
 
-            return transfer;
+            return { ...transfer }
         } catch (error) {
-            console.error(error);
-            throw new Error('Error al crear la transferencia');
+            console.log(error);
+            throw new Error(error);
         }
     }
 
@@ -39,17 +42,12 @@ export class TransferService {
         const transfers = await this.prisma.transfer.findMany({
             where: {
                 OR: [
-                    { senderId: senderId },
-                    { recipientId: senderId },
-                ],
-            },
-            include: {
-                sender: true,
-                recipient: true,
-                messages: true,
-            },
+                    { id_send: senderId },
+                    { id_received: senderId }
+                ]
+            }
         });
 
-        return { transfers };
+        return { transfers }
     }
 }
