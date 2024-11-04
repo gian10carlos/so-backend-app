@@ -27,11 +27,9 @@ model People {
   create_at        DateTime         @default(now())
   update_at        DateTime         @updatedAt
   accounts         Account[]
-  transfers        Transfer[]
+  sent_transfers   Transfer[]       @relation("SenderTransferRelation")
+  received         Transfer[]       @relation("RecipientTransferRelation")
   person_balances  PersonBalances[]
-
-  sent_messages     Message[] @relation("SenderRelation")
-  received_messages Message[] @relation("AddresseeRelation")
 }
 
 model PersonBalances {
@@ -56,26 +54,25 @@ model Account {
 }
 
 model Message {
-  id           Int       @unique @default(autoincrement())
-  id_people    Int?
-  id_addressee Int?
-  id_transfer  Int?
-  message      String
-  create_at    DateTime  @default(now())
-  update__at   DateTime  @updatedAt
-  sender       People?   @relation("SenderRelation", fields: [id_people], references: [id])
-  addressee    People?   @relation("AddresseeRelation", fields: [id_addressee], references: [id])
-  transfer     Transfer? @relation(fields: [id_transfer], references: [id])
+  id          Int      @unique @default(autoincrement())
+  id_transfer Int
+  message     String
+  create_at   DateTime @default(now())
+  update__at  DateTime @updatedAt
+
+  transfer Transfer? @relation(fields: [id_transfer], references: [id])
 }
 
 model Transfer {
-  id        Int      @unique @default(autoincrement())
-  id_people Int
-  amount    Float
-  date      DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @unique @default(autoincrement())
+  id_sender    Int
+  id_recipient Int
+  amount       Float
+  date         DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  people   People    @relation(fields: [id_people], references: [id])
-  messages Message[]
+  sender    People    @relation("SenderTransferRelation", fields: [id_sender], references: [id])
+  recipient People    @relation("RecipientTransferRelation", fields: [id_recipient], references: [id])
+  messages  Message[]
 }
