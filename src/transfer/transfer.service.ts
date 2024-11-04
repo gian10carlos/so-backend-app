@@ -10,36 +10,52 @@ export class TransferService {
 
     async create(createTransferDto: CreateTransferDto) {
         try {
-            const transferDtoData = {
-                id_sender: createTransferDto.id_sender,
-                id_recipient: createTransferDto.id_recipient,
-                amount: createTransferDto.amount,
-                date: createTransferDto.date,
-            }
-
-            const messageData = createTransferDto.message && createTransferDto.message.trim() !== ''
-                ? { create: { message: createTransferDto.message } }
-                : undefined;
+            const messageData =
+                createTransferDto.message?.trim() !== ""
+                    ? {
+                        create: {
+                            message: createTransferDto.message,
+                        },
+                    }
+                    : undefined;
 
             const transfer = await this.prisma.transfer.create({
                 data: {
-                    id_sender: createTransferDto.id_sender,
-                    id_recipient: createTransferDto.id_recipient,
+                    sender: {
+                        connect: {
+                            id: createTransferDto.id_sender,
+                        },
+                    },
+                    recipient: {
+                        connect: {
+                            id: createTransferDto.id_recipient,
+                        },
+                    },
                     amount: createTransferDto.amount,
                     date: new Date(createTransferDto.date),
-                    messages: messageData ? { create: { message: createTransferDto.message } } : undefined,
+                    messages: messageData,
                 },
                 select: {
                     id: true,
-                    id_sender: true,
-                    id_recipient: true,
+                    sender: {
+                        select: {
+                            id: true,
+                            dni: true,
+                        },
+                    },
+                    recipient: {
+                        select: {
+                            id: true,
+                            dni: true,
+                        },
+                    },
                     amount: true,
-                }
+                },
             });
 
-            return { ...transfer }
+            return transfer;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw new Error(error);
         }
     }
@@ -48,12 +64,18 @@ export class TransferService {
         const transfers = await this.prisma.transfer.findMany({
             where: {
                 OR: [
-                    { id_sender: senderId },
-                    { id_recipient: senderId }
-                ]
-            }
+                    { sender: { id: senderId } },
+                    { recipient: { id: senderId } },
+                ],
+            },
+            include: {
+                sender: true,
+                recipient: true,
+                messages: true,
+            },
         });
 
-        return { transfers }
+        return { transfers };
     }
+
 }
