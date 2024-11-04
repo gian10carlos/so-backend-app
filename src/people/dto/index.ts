@@ -1,0 +1,1 @@
+export { ListDniDto as SearchDniDto } from './list-dni.dto';
