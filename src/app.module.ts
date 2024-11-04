@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EnvConfiguration } from './config/env.config';
 import { JoiValidationSchema } from './config/join.validator';
 import { PeopleModule } from './people/people.module';
+import { TransferModule } from './transfer/transfer.module';
 
 @Module({
   imports: [
@@ -13,6 +14,8 @@ import { PeopleModule } from './people/people.module';
     }),
     PeopleModule,
     AuthModule,
+    PeopleModule,
+    TransferModule,
   ],
 })
 export class AppModule { }
