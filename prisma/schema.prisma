@@ -14,28 +14,30 @@ datasource db {
 }
 
 model People {
-  id               Int              @id @default(autoincrement())
-  dni              String           @unique
+  id               Int             @id @default(autoincrement())
+  dni              String          @unique
+  first_name       String?
+  last_name        String?
   code_identity    String
-  card_number      String           @unique
+  card_number      String          @unique
   ccv              String
   code_key         String
   password         String
-  status           Boolean          @default(true)
+  status           Boolean         @default(true)
   token            String?
   refreshing_token String?
-  create_at        DateTime         @default(now())
-  update_at        DateTime         @updatedAt
+  create_at        DateTime        @default(now())
+  update_at        DateTime        @updatedAt
   accounts         Account[]
-  send             Transfer[]       @relation(name: "send")
-  received         Transfer[]       @relation(name: "received")
-  person_balances  PersonBalances[]
+  send             Transfer[]      @relation(name: "send")
+  received         Transfer[]      @relation(name: "received")
+  person_balances  PersonBalances?
 }
 
 model PersonBalances {
   id        Int      @unique @default(autoincrement())
   id_people Int      @unique
-  amount    Float    @default(0)
+  amount    Float    @default(100)
   create_at DateTime @default(now())
   update_at DateTime @updatedAt
   people    People   @relation(fields: [id_people], references: [id])

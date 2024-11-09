@@ -1,8 +1,9 @@
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
-import { Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, Put, Request, UseGuards } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "./dto";
 import { AuthGuard } from "@nestjs/passport";
+import { LogOutUserDto } from "./dto/logout-user.dto";
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -24,6 +25,12 @@ export class AuthController {
     @Post('login')
     loginUser(@Body() loginUserDto: LoginUserDto) {
         return this.authService.login(loginUserDto);
+    }
+
+    @ApiResponse({ status: 200, description: 'User LogOut' })
+    @Patch('logout')
+    logOutUser(@Body() logOutUserDto: LogOutUserDto) {
+        return this.authService.logout(logOutUserDto);
     }
 
     @ApiResponse({ status: 200, description: 'User by token found' })

@@ -11,7 +11,6 @@ export class TransferService {
     async create(createTransferDto: CreateTransferDto) {
         try {
             const transferDtoData = {
-
                 id_send: createTransferDto.id_send,
                 id_received: createTransferDto.id_received,
                 amount: createTransferDto.amount,
@@ -36,6 +35,23 @@ export class TransferService {
                 }
             });
 
+            const persBalSend = await this.prisma.personBalances.findFirst({
+                where: { id_people: createTransferDto.id_send }
+            })
+
+            const persBalReceiv = await this.prisma.personBalances.findFirst({
+                where: { id_people: createTransferDto.id_received }
+            })
+
+            await this.prisma.personBalances.update({
+                where: { id_people: createTransferDto.id_send },
+                data: { amount: persBalSend.amount - createTransferDto.amount }
+            })
+            await this.prisma.personBalances.update({
+                where: { id_people: createTransferDto.id_received },
+                data: { amount: persBalReceiv.amount + createTransferDto.amount }
+            })
+
             return { ...transfer }
         } catch (error) {
             console.log(error);
@@ -53,6 +69,14 @@ export class TransferService {
             }
         });
 
-        return { transfers }
+        const people = await this.prisma.people.findFirst({
+            where: { id: senderId },
+            select: {
+                first_name: true,
+                person_balances: { select: { amount: true } }
+            }
+        })
+
+        return { ...transfers, people }
     }
 }
