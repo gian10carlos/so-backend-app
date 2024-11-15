@@ -21,7 +21,7 @@ export class PeopleService {
                 id: true,
                 dni: true,
             },
-            take: 10,
+            take: 5,
         })
     }
 }

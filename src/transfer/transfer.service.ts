@@ -66,7 +66,12 @@ export class TransferService {
                     { id_send: senderId },
                     { id_received: senderId }
                 ]
-            }
+            },
+            include: {
+                send: { select: { first_name: true } },
+                received: { select: { first_name: true } },
+            },
+            orderBy: { date: 'desc' }
         });
 
         const people = await this.prisma.people.findFirst({
