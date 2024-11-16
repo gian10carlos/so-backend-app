@@ -11,14 +11,6 @@ export class CreateUserDto {
 
     @ApiProperty()
     @IsString()
-    first_name: string
-
-    @ApiProperty()
-    @IsString()
-    last_name: string
-
-    @ApiProperty()
-    @IsString()
     @MaxLength(1)
     @IsOptional()
     code_identity?: string;

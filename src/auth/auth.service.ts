@@ -5,24 +5,32 @@ import * as bcrypt from 'bcrypt';
 import { JwtPayload } from "./interfaces/jwt.payload.interface";
 import { Injectable } from "@nestjs/common";
 import { LogOutUserDto } from "./dto/logout-user.dto";
+import { ReniecService } from "./service/reniecService";
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly jwtService: JwtService,
+        private readonly reniecService: ReniecService,
     ) { }
 
     async create(createUserDto: CreateUserDto) {
         try {
+
+            const dniData = await this.reniecService.getDniData(createUserDto.dni);
+            if (!dniData || !dniData.nombres) {
+                throw new Error('DNI no válido o no encontrado en RENIEC');
+            }
+
             const userDtoData = {
-                dni: createUserDto.dni, // 8 digitos
-                first_name: createUserDto.first_name,
-                last_name: createUserDto.last_name,
-                code_identity: createUserDto.code_identity, // 1 digito
-                card_number: createUserDto.card_number, // 14 caracteres
-                ccv: createUserDto.ccv, // 3 digitos
-                code_key: createUserDto.code_key // 4 digitos
+                dni: createUserDto.dni,
+                first_name: dniData.nombres,
+                last_name: dniData.apellidoPaterno + dniData.apellidoMaterno,
+                code_identity: createUserDto.code_identity,
+                card_number: createUserDto.card_number,
+                ccv: createUserDto.ccv,
+                code_key: createUserDto.code_key,
             };
 
             const [user] = await this.prisma.$transaction([
@@ -34,10 +42,10 @@ export class AuthService {
                         person_balances: { create: { amount: createUserDto.amount } },
                         accounts: {
                             create: {
-                                ip_log: createUserDto.ip_log, // IP public
-                                dateInp: createUserDto.dateInp, // date and hour
-                                dateUtil: createUserDto.dateUtil, // dateInp - dateOut
-                                dateOut: createUserDto.dateOut, // date and hour
+                                ip_log: createUserDto.ip_log,
+                                dateInp: createUserDto.dateInp,
+                                dateUtil: createUserDto.dateUtil,
+                                dateOut: createUserDto.dateOut,
                             }
                         },
                     },
