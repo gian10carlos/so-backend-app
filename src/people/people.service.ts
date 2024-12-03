@@ -9,13 +9,15 @@ export class PeopleService {
     ) { }
 
     async listPeopleDni(searchDniDto: SearchDniDto) {
+        const { dni, id } = searchDniDto;
         return this.prisma.people.findMany({
             where: {
                 dni: {
-                    contains: searchDniDto.dni,
+                    contains: dni,
                     mode: 'insensitive'
                 },
                 status: true,
+                id: { not: Number(id) },
             },
             select: {
                 id: true,

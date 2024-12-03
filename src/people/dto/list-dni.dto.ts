@@ -1,8 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class ListDniDto {
     @ApiProperty()
+    @IsString()
+    id: string;
+
+    @ApiProperty()
+    @IsString()
     @IsOptional()
     dni: string;
 }
