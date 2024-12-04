@@ -13,6 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Version {
+  id        Int      @id @default(autoincrement())
+  version   String
+  status    Boolean
+  create_at DateTime @default(now())
+  update_at DateTime @default(now()) @updatedAt
+}
+
 model People {
   id               Int             @id @default(autoincrement())
   dni              String          @unique

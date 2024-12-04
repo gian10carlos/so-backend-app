@@ -5,6 +5,7 @@ import { EnvConfiguration } from './config/env.config';
 import { JoiValidationSchema } from './config/join.validator';
 import { PeopleModule } from './people/people.module';
 import { TransferModule } from './transfer/transfer.module';
+import { VersionModule } from './version/version.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TransferModule } from './transfer/transfer.module';
     AuthModule,
     PeopleModule,
     TransferModule,
+    VersionModule,
   ],
 })
 export class AppModule { }

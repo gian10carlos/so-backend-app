@@ -89,7 +89,10 @@ export class AuthService {
 
         try {
             const user = await this.prisma.people.findUnique({
-                where: { dni },
+                where: {
+                    dni: dni,
+                    status: true,
+                },
             });
 
             if (!user) throw new Error('User not found');

@@ -60,28 +60,39 @@ export class TransferService {
     }
 
     async getMe(senderId: number) {
-        const transfers = await this.prisma.transfer.findMany({
-            where: {
-                OR: [
-                    { id_send: senderId },
-                    { id_received: senderId }
-                ]
-            },
-            include: {
-                send: { select: { first_name: true } },
-                received: { select: { first_name: true } },
-            },
-            orderBy: { date: 'desc' }
-        });
+        try {
+            const user = await this.prisma.people.findUnique({
+                where: { id: senderId, status: true, },
+            });
 
-        const people = await this.prisma.people.findFirst({
-            where: { id: senderId },
-            select: {
-                first_name: true,
-                person_balances: { select: { amount: true } }
-            }
-        })
+            if (!user) throw new Error('User disabled');
 
-        return { ...transfers, people }
+            const transfers = await this.prisma.transfer.findMany({
+                where: {
+                    OR: [
+                        { id_send: senderId },
+                        { id_received: senderId }
+                    ],
+                },
+                include: {
+                    send: { select: { first_name: true } },
+                    received: { select: { first_name: true } },
+                },
+                orderBy: { date: 'desc' }
+            });
+
+            const people = await this.prisma.people.findFirst({
+                where: { id: senderId },
+                select: {
+                    first_name: true,
+                    person_balances: { select: { amount: true } }
+                }
+            })
+
+            return { ...transfers, people }
+
+        } catch (error) {
+            return Error(error);
+        }
     }
 }
