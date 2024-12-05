@@ -3,7 +3,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CreateUserDto, LoginUserDto } from "./dto";
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from "./interfaces/jwt.payload.interface";
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { LogOutUserDto } from "./dto/logout-user.dto";
 import { ReniecService } from "./service/reniecService";
 
@@ -20,7 +20,15 @@ export class AuthService {
 
             const dniData = await this.reniecService.getDniData(createUserDto.dni);
             if (!dniData || !dniData.nombres) {
-                throw new Error('DNI no válido o no encontrado en RENIEC');
+                throw new BadRequestException('DNI no válido o no encontrado en RENIEC');
+            }
+
+            const userExists = await this.prisma.people.findUnique({
+                where: { dni: createUserDto.dni },
+            });
+
+            if (userExists) {
+                throw new BadRequestException('El usuario con este DNI ya existe');
             }
 
             const userDtoData = {
@@ -79,8 +87,10 @@ export class AuthService {
 
             return updateRegister;
         } catch (error) {
-            console.log(error)
-            throw new Error(error);
+            if (error instanceof BadRequestException || error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Ocurrió un error inesperado al crear el usuario');
         }
     }
 
@@ -95,10 +105,11 @@ export class AuthService {
                 },
             });
 
-            if (!user) throw new Error('User not found');
+            if (!user) throw new NotFoundException('Usuario no encontrado');
 
-            if (!bcrypt.compareSync(password, user.password)) {
-                throw new Error('Invalid Password');
+            const isPasswordValid = bcrypt.compareSync(password, user.password);
+            if (!isPasswordValid) {
+                throw new UnauthorizedException('Contraseña incorrecta');
             }
 
             const account = await this.prisma.account.create({
@@ -117,7 +128,13 @@ export class AuthService {
                 })
             }
         } catch (error) {
-            throw Error(error);
+            if (
+                error instanceof NotFoundException ||
+                error instanceof UnauthorizedException
+            ) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error al intentar iniciar sesión, intente mas tarde');
         }
     }
 
